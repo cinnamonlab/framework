@@ -1,0 +1,9 @@
+{
+    "name": "hajime3333out/framework",
+    "description": "The Simple Framework.",
+    "autoload": {
+        "psr-4": {
+            "Framework\\": "src/Framework/"
+        }
+    }
+}
