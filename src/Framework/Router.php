@@ -2,6 +2,7 @@
 namespace Framework;
 
 use Framework\Exception\FrameworkException;
+use Framework\ExceptionHandler\ErrorResponse;
 use Framework\Validator\Validator;
 use Exception;
 
@@ -12,9 +13,11 @@ class Router
     private $parameters;
     private $path;
     private $is_called;
+    private $error_response;
 
     private function __construct( ) {
         $this->is_called = false;
+        $this->error_response = null;
         $request_uri = preg_split( "/\?/", $_SERVER['REQUEST_URI'], 2 );
         if ( isset($request_uri[1]) ) {
             parse_str($request_uri, $this->parameters);
@@ -75,7 +78,8 @@ class Router
         $path_array = array_values($path_array);
 
         foreach( $path_array as $key => $path_element ) {
-            if ( preg_match("/^\:(.*)$/", $path_element, $match) ) {
+            if ( preg_match("/^\:(.*)$/", $path_element, $match)
+                || preg_match("/^\{(.*)\}$/", $path_element, $match )) {
                 $me->parameters[$match[1]] = $me->path[$key];
             } else {
                 if ( $me->path[$key] != $path_element ) {
@@ -84,9 +88,20 @@ class Router
             }
         }
 
-        if ( is_callable( $function ) ) {
+        try {
+            if ( is_callable( $function ) ) {
+                $response = $function();
+            } else {
 
-            $response = $function();
+                $function_array = preg_split("/@/", $function );
+                if ( !isset($function_array[1]))
+                    throw FrameworkException::internalError('Routing Error');
+
+                $class_name = $function_array[0];
+                $method_name = $function_array[1];
+
+                $response = $class_name::$method_name();
+            }
 
             if ( $response instanceof Response ) {
                 $response->display();
@@ -96,20 +111,23 @@ class Router
                     ->setContent($response)
                     ->display();
             }
-
             $me->is_called = true;
-            return true;
+        } catch ( FrameworkException $e ) {
+            $me->handleError($e);
+
+        } catch ( Exception $e ) {
+            $exception = FrameworkException::internalError('Internal Error');
+            $me->handleError($exception);
         }
+        return true;
+    }
 
-        $function_array = preg_split("/@/", $function );
-        if ( !isset($function_array[1])) return false;
 
-        $class_name = $function_array[0];
-        $method_name = $function_array[1];
-
-        $class_name::$method_name();
-        $me->is_called = true;
-
+    private function handleError( FrameworkException $e ) {
+        if ( $this->error_response == null ) {
+            $this->error_response = new ErrorResponse();
+        }
+        $this->error_response->set( $e )->display();
         return true;
     }
 

@@ -2,6 +2,8 @@
 
 namespace Framework;
 
+use Framework\Exception\FrameworkException;
+
 class Response {
 
     private $code;
@@ -14,6 +16,42 @@ class Response {
             ->setCode($code)
             ->setContent(json_decode($data))
             ->setContentType('application/json');
+    }
+
+    static function handleException( FrameworkException $e, $type ) {
+        if ( $type == 'json') {
+            $data = array(
+                'status' => $e->getCode(),
+                'message' => $e->getMessage()
+            );
+            return Response::json($data)->setCode($e->getCode());
+        }
+
+        if ( $type == 'debug') {
+            $errors = $e->getTrace();
+            //TODO: displaying Error Tracing without view logic
+
+            $message = "<pre>" . $e->getMessage();
+            foreach($errors as $error ) {
+
+                $message .= "at function " . $error['function']
+                    . "at line " . $error['line']
+                    . "in file " . $error['file'] . "\n";
+            }
+
+            $message .= "</pre>";
+            return (new Response())
+                ->setContentType('text/html')
+                ->setCode($e->getCode())
+                ->setContent($message);
+        }
+
+        if ( $type == 'log' ) {
+            //TODO: error log option
+        }
+
+        return (new Response())->setCode($e->getCode());
+
     }
 
     static function redirect( $redirect_to, $code = 302 ) {
