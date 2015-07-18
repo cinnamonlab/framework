@@ -60,7 +60,7 @@ class Response {
             ->addHeader('Location: ' . $redirect_to);
     }
 
-    function construct( ) {
+    function __construct( ) {
         $this->headers = array();
         $this->code = 200;
         $this->content = "";
