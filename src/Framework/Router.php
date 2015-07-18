@@ -1,9 +1,12 @@
 <?php
 namespace Framework;
 
+use Framework\Exception\FrameworkException;
+use Framework\Validator\Validator;
+use Exception;
+
 class Router
 {
-
     private static $me;
 
     private $parameters;
@@ -39,6 +42,22 @@ class Router
         return self::$me;
     }
 
+    private function processDefaultValue( $default ) {
+        if ( $default instanceof FrameworkException ) {
+            throw $default;
+        } else if ( is_callable( $default ) ) {
+            return $default();
+        }
+        return $default;
+    }
+
+    /**
+     * @param $method
+     * @param $path
+     * @param $function
+     * @return bool
+     */
+
     static function action($method, $path, $function) {
 
         if ( $method != $_SERVER['REQUEST_METHOD'] )
@@ -66,7 +85,18 @@ class Router
         }
 
         if ( is_callable( $function ) ) {
-            $function();
+
+            $response = $function();
+
+            if ( $response instanceof Response ) {
+                $response->display();
+            } else {
+                $rs = new Response();
+                $rs->setContentType('text/html')
+                    ->setContent($response)
+                    ->display();
+            }
+
             $me->is_called = true;
             return true;
         }
@@ -81,6 +111,38 @@ class Router
         $me->is_called = true;
 
         return true;
+    }
+
+    static function set( $key, $value ) {
+        $me = self::getInstance();
+        $me->parameters[$key] = $value;
+    }
+
+    static function get( $key, $default = "", $validator = null ) {
+        $me = self::getInstance();
+
+        if ( isset($me->parameters[$key]) ) {
+
+            $value = $me->parameters[$key];
+
+            if ( $validator instanceof Validator ) {
+                if ( $validator->execute($value) )
+                    return $value;
+
+            } else if ( is_callable( $validator ) ) {
+                try {
+                    if ( $validator( $value ) )
+                        return $value;
+
+                } catch (Exception $e) {
+                    throw FrameworkException::internalError("Validator error");
+                }
+            }
+            return $value;
+        }
+
+        return $me->processDefaultValue($default);
+
     }
 
 }
