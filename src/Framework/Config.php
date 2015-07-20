@@ -1,9 +1,13 @@
 <?php
 namespace Framework;
 
+/**
+ * Class Config
+ *
+ * @package Framework
+ */
 class Config
 {
-    private static $data;
 
     public static function get( $key, $default = null ) {
 
@@ -26,4 +30,6 @@ class Config
         }
         return $return;
     }
+
+    private static $data;
 }

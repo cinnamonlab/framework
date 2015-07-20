@@ -1,6 +1,6 @@
 <?php
 
-namespace Framework\ExceptionHandler;
+namespace Framework\ErrorResponse;
 
 use Framework\Exception\FrameworkException;
 use Framework\Response;
