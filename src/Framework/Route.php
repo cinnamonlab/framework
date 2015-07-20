@@ -2,7 +2,7 @@
 namespace Framework;
 
 use Framework\Exception\FrameworkException;
-use Framework\ExceptionHandler\ErrorResponse;
+use Framework\ErrorResponse\ErrorResponse;
 use Exception;
 
 /**
