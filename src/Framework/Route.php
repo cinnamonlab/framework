@@ -33,7 +33,8 @@ class Route
                 || preg_match("/^\{(.*)\}$/", $path_element, $match )) {
                 Input::set($match[1], $me->path[$key]);
             } else {
-                if ( $me->path[$key] != $path_element ) {
+                if ( ! isset($me->path[$key]) ||
+                    $me->path[$key] != $path_element ) {
                     return false;
                 }
             }
@@ -82,8 +83,15 @@ class Route
     static function put($path, $function) {
         return self::action('PUT', $path, $function);
     }
+    static function patch($path, $function) {
+        return self::action('PATCH', $path, $function);
+    }
     static function delete($path, $function) {
         return self::action('DELETE', $path, $function);
+    }
+
+    public static function reset( ) {
+        self::$me = null;
     }
 
 
