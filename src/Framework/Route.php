@@ -94,6 +94,11 @@ class Route
         self::$me = null;
     }
 
+    public static function setErrorResponse( ErrorResponse $e ) {
+        $me = self::getInstance();
+        $me->error_response = $e;
+    }
+
 
     private static $me;
     private $path;
