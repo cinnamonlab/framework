@@ -10,9 +10,21 @@ class Config
 {
 
     public static function get( $key, $default = null ) {
-
+        if ( ! self::has($key) ) return $default;
+        
         $key_array = preg_split('/\./', $key );
-        if ( !isset($key_array[0]) ) return null;
+        $return = self::$data;
+
+        foreach($key_array as $k) {
+            if ( !isset($return[$k]) ) return $default;
+            $return = $return[$k];
+        }
+        return $return;
+    }
+    
+    public static function has( $key ) {
+        $key_array = preg_split('/\./', $key );
+        if ( !isset($key_array[0]) ) return false;
 
         if ( !isset(self::$data[$key_array[0]])) {
             self::$data[$key_array[0]] =
@@ -22,13 +34,11 @@ class Config
             }
         }
 
-        $return = self::$data;
-
         foreach($key_array as $k) {
-            if ( !isset($return[$k]) ) return $default;
-            $return = $return[$k];
+            if ( !isset($return[$k]) ) return false;
         }
-        return $return;
+
+        return true;
     }
 
     private static $data;
