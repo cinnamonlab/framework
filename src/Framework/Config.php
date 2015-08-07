@@ -34,8 +34,10 @@ class Config
             }
         }
 
+        $return = self::$data;
         foreach($key_array as $k) {
             if ( !isset($return[$k]) ) return false;
+            else $return = $return[$k];
         }
 
         return true;
