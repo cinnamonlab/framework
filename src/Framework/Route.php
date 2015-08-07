@@ -66,10 +66,10 @@ class Route
             }
             $me->is_called = true;
         } catch ( FrameworkException $e ) {
-            $me->handleError($e);
+            $me->handleError( $e );
 
         } catch ( Exception $e ) {
-            $exception = FrameworkException::internalError('Internal Error');
+            $exception = FrameworkException::internalError('Internal Error: ' . $e->getMessage( ) );
             $me->handleError($exception);
         }
         return true;
