@@ -16,7 +16,7 @@ class ErrorDisplayResponse extends ErrorResponse {
         }
 
         $this->setCode($e->getCode())
-            ->setContent()
+            ->setContent($message)
             ->setContentType('text/plain');
         return $this;
     }
