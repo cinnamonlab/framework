@@ -1,6 +1,7 @@
 <?php
 namespace Framework;
 
+use Framework\ErrorResponse\ErrorDisplayResponse;
 use Framework\Exception\FrameworkException;
 use Framework\ErrorResponse\ErrorResponse;
 use Exception;
@@ -132,7 +133,9 @@ class Route
 
     private function handleError( FrameworkException $e ) {
         if ( $this->error_response == null ) {
-            $this->error_response = new ErrorResponse();
+            if ( Config::get('app.debug', false ) )
+                $this->error_response = new ErrorDisplayResponse();
+            else $this->error_response = new ErrorResponse();
         }
         $this->error_response->set( $e )->display();
         return true;

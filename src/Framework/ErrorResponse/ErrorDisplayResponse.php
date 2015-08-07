@@ -5,7 +5,7 @@ namespace Framework\ErrorResponse;
 use Framework\Exception\FrameworkException;
 use Framework\Response;
 
-class ErrorDisplayResponse extends Response {
+class ErrorDisplayResponse extends ErrorResponse {
 
     function set( FrameworkException $e ) {
         $this->setCode($e->getCode())
