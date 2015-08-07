@@ -8,8 +8,15 @@ use Framework\Response;
 class ErrorDisplayResponse extends ErrorResponse {
 
     function set( FrameworkException $e ) {
+        $traces = $e->getTrace();
+        $message = $e->getMessage();
+        foreach( $traces as $t ) {
+            $message .= "\n  in " . $t['file'] . " (line " . $t['line'] . ")"
+                . "\n    at class " . $t['class'] . " with params " . print_r($t['args'], true) . "\n";
+        }
+
         $this->setCode($e->getCode())
-            ->setContent(print_r($e->getTrace()))
+            ->setContent()
             ->setContentType('text/plain');
         return $this;
     }
