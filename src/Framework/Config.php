@@ -75,6 +75,7 @@ class Config
             if ( !isset($return[$k]) ) {
                 return false;
             }
+            $return = $return[$k];
         }
 
         return true;
