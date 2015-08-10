@@ -1,6 +1,7 @@
 <?php
 namespace Framework;
 
+use Framework\ErrorResponse\ErrorDisplayResponse;
 use Framework\Exception\FrameworkException;
 use Framework\ErrorResponse\ErrorResponse;
 use Exception;
@@ -65,10 +66,10 @@ class Route
             }
             $me->is_called = true;
         } catch ( FrameworkException $e ) {
-            $me->handleError($e);
+            $me->handleError( $e );
 
         } catch ( Exception $e ) {
-            $exception = FrameworkException::internalError('Internal Error');
+            $exception = FrameworkException::internalError('Internal Error: ' . $e->getMessage( ) );
             $me->handleError($exception);
         }
         return true;
@@ -132,7 +133,9 @@ class Route
 
     private function handleError( FrameworkException $e ) {
         if ( $this->error_response == null ) {
-            $this->error_response = new ErrorResponse();
+            if ( Config::get('app.debug', false ) )
+                $this->error_response = new ErrorDisplayResponse();
+            else $this->error_response = new ErrorResponse();
         }
         $this->error_response->set( $e )->display();
         return true;

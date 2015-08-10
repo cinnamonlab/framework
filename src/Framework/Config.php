@@ -23,6 +23,7 @@ class Config
         self::$data[$key] = $value;
     }
 
+
     /**
      * Get Configuration
      *
@@ -31,6 +32,21 @@ class Config
      * @return null
      */
     public static function get( $key, $default = null ) {
+        if ( ! self::has($key) ) {
+            if ( $default instanceof FrameworkException ) throw $default;
+            return $default;
+        }
+        
+        $key_array = preg_split('/\./', $key );
+        $return = self::$data;
+
+        foreach($key_array as $k)
+            $return = $return[$k];
+
+        return $return;
+    }
+    
+    public static function has( $key ) {
 
         if ( defined('__APP__') ) $base_path = __APP__;
         else {
@@ -44,7 +60,7 @@ class Config
         }
 
         $key_array = preg_split('/\./', $key );
-        if ( !isset($key_array[0]) ) return null;
+        if ( !isset($key_array[0]) ) return false;
 
         if ( !isset(self::$data[$key_array[0]])) {
             self::$data[$key_array[0]] =
@@ -55,17 +71,13 @@ class Config
         }
 
         $return = self::$data;
-
         foreach($key_array as $k) {
             if ( !isset($return[$k]) ) {
-                if ( $default instanceof FrameworkException ) {
-                    throw $default;
-                }
-                else return $default;
+                return false;
             }
-            $return = $return[$k];
         }
-        return $return;
+
+        return true;
     }
 
     private static $data;
