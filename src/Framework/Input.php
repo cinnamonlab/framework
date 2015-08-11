@@ -138,10 +138,11 @@ class Input {
         self::getInstance()->file_serialization = $value;
     }
 
-    public function getAllData( ) {
+    public static function getAllData( ) {
         $response = array('parameters' => $_REQUEST );
+        $me = self::getInstance();
 
-        if ( $this->file_serialization ) {
+        if ( $me->file_serialization ) {
             if (isset($_FILES) && count($_FILES) > 0) {
                 foreach ($_FILES as $key => $file) {
                     if ($file['error'] == UPLOAD_ERR_OK) {
