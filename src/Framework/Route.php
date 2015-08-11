@@ -16,9 +16,14 @@ use Framework\Processor\Processor;
  */
 class Route
 {
+
+    static function otherwise( $function ) {
+        self::action('otherwise', null, $function);
+    }
+
     static function action($method, $path, $function) {
 
-        if ( $method != 'else' ) {
+        if ( $method != 'otherwise' ) {
 
             if ($method != $_SERVER['REQUEST_METHOD'])
                 return IgnoreProcessor::getInstance();

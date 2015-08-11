@@ -10,7 +10,7 @@ abstract class Processor
     private static $me = null;
 
     public static function getInstance( ) {
-        if ( self::$me == null ) self::$me = new IgnoreProcessor();
+        if ( self::$me == null ) self::$me = new static();
         return self::$me;
     }
 
