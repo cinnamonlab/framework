@@ -5,9 +5,8 @@ namespace Framework;
 use Exception;
 use Framework\Exception\FrameworkException;
 use Framework\Validator\Validator;
-use Serializable;
 
-class Input implements Serializable {
+class Input {
 
     /**
      * Get Value
@@ -139,7 +138,7 @@ class Input implements Serializable {
         self::getInstance()->file_serialization = $value;
     }
 
-    public function serialize( ) {
+    public function getAllData( ) {
         $response = array('parameters' => $_REQUEST );
 
         if ( $this->file_serialization ) {
@@ -159,15 +158,10 @@ class Input implements Serializable {
                 }
             }
         }
-        return json_encode($response);
+        return $response;
     }
 
-    public function unserialize( $str ) {
-        try {
-            $data = json_decode($str, true);
-        } catch ( Exception $e ) {
-            throw FrameworkException::internalError("Input Unserialization Error");
-        }
+    public function bind( $data ) {
         if ( isset($data['parameters'] ) ) {
             $this->parameters = $data['parameters'];
         }
@@ -175,9 +169,6 @@ class Input implements Serializable {
         if ( isset($data['files'] ) ) {
             $_FILES = $data['files'];
         }
-    }
-
-    static function bindFromJson( $str ) {
-        self::getInstance()->unserialize($str);
+        return;
     }
 }
