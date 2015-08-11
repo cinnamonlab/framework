@@ -127,8 +127,7 @@ class Route
     private $error_response;
     private $post_processor;
 
-    private function __construct( $void ) {
-        if ( $void )
+    private function __construct( ) {
         $this->is_called = false;
         $this->error_response = null;
         $this->post_processor = null;

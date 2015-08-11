@@ -3,7 +3,7 @@
 namespace Framework\Processor;
 
 
-class Processor
+abstract class Processor
 {
     abstract public function then( $func );
 
