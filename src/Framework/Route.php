@@ -23,13 +23,14 @@ class Route
 
     static function action($method, $path, $function) {
 
+        $me = self::getInstance();
+        if ($me->is_called == true) return IgnoreProcessor::getInstance();
+
         if ( $method != 'otherwise' ) {
 
             if ($method != $_SERVER['REQUEST_METHOD'])
                 return IgnoreProcessor::getInstance();
 
-            $me = self::getInstance();
-            if ($me->is_called == true) return IgnoreProcessor::getInstance();
 
             $path_array = preg_split("/\//", $path);
             foreach ($path_array as $key => $path_element) {
