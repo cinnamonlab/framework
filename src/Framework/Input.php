@@ -133,20 +133,29 @@ class Input implements Serializable {
         return $throw_exception;
     }
 
+    private $file_serialization = false;
+
+    public static function file_serialize( $value = true) {
+        self::getInstance()->file_serialization = $value;
+    }
+
     public function serialize( ) {
         $response = array('parameters' => $_REQUEST );
-        if ( isset($_FILES) && count($_FILES) > 0 ) {
-            foreach( $_FILES as $key => $file ) {
-                if ( $file['error'] == UPLOAD_ERR_OK ) {
-                    do {
-                        $to_file = __APP__ . "/storage/files/" . md5($file['tmp_name'] . rand(0, 100000));
-                    } while ( file_exists($to_file) );
 
-                    if ( copy( $file['tmp_name'], $to_file) ) {
-                        $response['files'][$key] = $file;
-                        $response['files']['tmp_name'] = $to_file;
+        if ( $this->file_serialization ) {
+            if (isset($_FILES) && count($_FILES) > 0) {
+                foreach ($_FILES as $key => $file) {
+                    if ($file['error'] == UPLOAD_ERR_OK) {
+                        do {
+                            $to_file = __APP__ . "/storage/files/" . md5($file['tmp_name'] . rand(0, 100000));
+                        } while (file_exists($to_file));
+
+                        if (copy($file['tmp_name'], $to_file)) {
+                            $response['files'][$key] = $file;
+                            $response['files']['tmp_name'] = $to_file;
+                        }
+
                     }
-
                 }
             }
         }
