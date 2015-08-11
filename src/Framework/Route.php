@@ -148,17 +148,23 @@ class Route
         $this->error_response = null;
         $this->post_processor = null;
 
-        $request_uri = preg_split( "/\?/", $_SERVER['REQUEST_URI'], 2 );
-        $requestUri = preg_split( "/\//", $request_uri[0] );
-        $scriptName = preg_split( "/\//", $_SERVER['SCRIPT_NAME'] );
+        if ( Input::has('__request_uri') ) {
+            $this->path = Input::get('__request_uri');
+        } else {
+            $request_uri = preg_split( "/\?/", $_SERVER['REQUEST_URI'], 2 );
+            $requestUri = preg_split( "/\//", $request_uri[0] );
+            $scriptName = preg_split( "/\//", $_SERVER['SCRIPT_NAME'] );
 
-
-        foreach ($scriptName as $key => $value) {
-            if ($value == $requestUri[$key]){
-                unset($requestUri[$key]) ;
+            foreach ($scriptName as $key => $value) {
+                if ($value == $requestUri[$key]){
+                    unset($requestUri[$key]) ;
+                }
             }
+
+            $this->path = array_values($requestUri);
+            Input::set('__request_uri', $this->path);
         }
-        $this->path = array_values($requestUri);
+
 
     }
 
