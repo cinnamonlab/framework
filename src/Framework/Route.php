@@ -5,6 +5,9 @@ use Framework\ErrorResponse\ErrorDisplayResponse;
 use Framework\Exception\FrameworkException;
 use Framework\ErrorResponse\ErrorResponse;
 use Exception;
+use Framework\Processor\IgnoreProcessor;
+use Framework\Processor\PostProcessor;
+use Framework\Processor\Processor;
 
 /**
  * Class Route
@@ -15,28 +18,33 @@ class Route
 {
     static function action($method, $path, $function) {
 
-        if ( $method != $_SERVER['REQUEST_METHOD'] )
-            return false;
+        if ( $method != 'else' ) {
 
-        $me = self::getInstance();
-        if ( $me->is_called == true ) return false;
+            if ($method != $_SERVER['REQUEST_METHOD'])
+                return IgnoreProcessor::getInstance();
 
-        $path_array = preg_split("/\//", $path);
-        foreach( $path_array as $key => $path_element ) {
-            if ( strlen(trim($path_element)) == 0 ) {
-                unset($path_array[$key]);
+            $me = self::getInstance();
+            if ($me->is_called == true) return IgnoreProcessor::getInstance();
+
+            $path_array = preg_split("/\//", $path);
+            foreach ($path_array as $key => $path_element) {
+                if (strlen(trim($path_element)) == 0) {
+                    unset($path_array[$key]);
+                }
             }
-        }
-        $path_array = array_values($path_array);
+            $path_array = array_values($path_array);
 
-        foreach( $path_array as $key => $path_element ) {
-            if ( preg_match("/^\:(.*)$/", $path_element, $match)
-                || preg_match("/^\{(.*)\}$/", $path_element, $match )) {
-                Input::set($match[1], $me->path[$key]);
-            } else {
-                if ( ! isset($me->path[$key]) ||
-                    $me->path[$key] != $path_element ) {
-                    return false;
+            foreach ($path_array as $key => $path_element) {
+                if (preg_match("/^\:(.*)$/", $path_element, $match)
+                    || preg_match("/^\{(.*)\}$/", $path_element, $match)
+                ) {
+                    Input::set($match[1], $me->path[$key]);
+                } else {
+                    if (!isset($me->path[$key]) ||
+                        $me->path[$key] != $path_element
+                    ) {
+                        return IgnoreProcessor::getInstance();
+                    }
                 }
             }
         }
@@ -67,12 +75,14 @@ class Route
             $me->is_called = true;
         } catch ( FrameworkException $e ) {
             $me->handleError( $e );
+            return IgnoreProcessor::getInstance();
 
         } catch ( Exception $e ) {
             $exception = FrameworkException::internalError('Internal Error: ' . $e->getMessage( ) );
             $me->handleError($exception);
+            return IgnoreProcessor::getInstance();
         }
-        return true;
+        return $me->getPostProcessor();
     }
 
     static function get($path, $function) {
@@ -100,15 +110,29 @@ class Route
         $me->error_response = $e;
     }
 
+    public static function setPostProcessor( Processor $p ) {
+        $me = self::getInstance();
+        $me->post_processor = $p;
+    }
+
+    private function getPostProcessor( ) {
+        if ( $this->post_processor ) return $this->post_processor;
+        else return PostProcessor::getInstance();
+    }
+
 
     private static $me;
     private $path;
     private $is_called;
     private $error_response;
+    private $post_processor;
 
-    private function __construct( ) {
+    private function __construct( $void ) {
+        if ( $void )
         $this->is_called = false;
         $this->error_response = null;
+        $this->post_processor = null;
+
         $request_uri = preg_split( "/\?/", $_SERVER['REQUEST_URI'], 2 );
         $requestUri = preg_split( "/\//", $request_uri[0] );
         $scriptName = preg_split( "/\//", $_SERVER['SCRIPT_NAME'] );
