@@ -9,7 +9,7 @@ class PostProcessor extends Processor
     public function then( $func ) {
 
         if ( is_callable( $func ) ) {
-            $function();
+            $func();
         }
         if ( is_string( $func ) ) {
             $function_array = preg_split("/@/", $func );
