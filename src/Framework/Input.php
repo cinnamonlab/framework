@@ -5,8 +5,9 @@ namespace Framework;
 use Exception;
 use Framework\Exception\FrameworkException;
 use Framework\Validator\Validator;
+use Serializable;
 
-class Input {
+class Input implements Serializable {
 
     /**
      * Get Value
@@ -71,9 +72,9 @@ class Input {
             || $_FILES[$key]['error'] != UPLOAD_ERR_OK)
             return self::processError($default);
 
-        $file = new InputFile($_FILES['key']['tmp_name']);
-        $file->setContentType($_FILES['key']['type']);
-        $file->setOriginalName($_FILES['key']['name']);
+        $file = new InputFile($_FILES[$key]['tmp_name']);
+        $file->setContentType($_FILES[$key]['type']);
+        $file->setOriginalName($_FILES[$key]['name']);
 
         if ($validator instanceof Validator) {
             if ( $validator->execute( $file ) ) {
@@ -130,5 +131,44 @@ class Input {
         if ( $throw_exception instanceof Exception )
             throw $throw_exception;
         return $throw_exception;
+    }
+
+    public function serialize( ) {
+        $response = array('parameters' => $_REQUEST );
+        if ( isset($_FILES) && count($_FILES) > 0 ) {
+            foreach( $_FILES as $key => $file ) {
+                if ( $file['error'] == UPLOAD_ERR_OK ) {
+                    do {
+                        $to_file = __APP__ . "/storage/files/" . md5($file['tmp_name'] . rand(0, 100000));
+                    } while ( file_exists($to_file) );
+
+                    if ( copy( $file['tmp_name'], $to_file) ) {
+                        $response['files'][$key] = $file;
+                        $response['files']['tmp_name'] = $to_file;
+                    }
+
+                }
+            }
+        }
+        return json_encode($response);
+    }
+
+    public function unserialize( $str ) {
+        try {
+            $data = json_decode($str, true);
+        } catch ( Exception $e ) {
+            throw FrameworkException::internalError("Input Unserialization Error");
+        }
+        if ( isset($data['parameters'] ) ) {
+            $this->parameters = $data['parameters'];
+        }
+
+        if ( isset($data['files'] ) ) {
+            $_FILES = $data['files'];
+        }
+    }
+
+    static function bindFromJson( $str ) {
+        self::getInstance()->unserialize($str);
     }
 }
