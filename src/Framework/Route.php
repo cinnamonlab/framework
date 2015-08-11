@@ -55,6 +55,8 @@ class Route
             }
         }
 
+        if ( $me->skip ) return $me->getPostProcessor();
+
         try {
             if ( is_callable( $function ) ) {
                 $response = $function();
@@ -121,6 +123,14 @@ class Route
         $me->post_processor = $p;
     }
 
+
+    private $skip = false;
+
+    public static function setSkipMain( ) {
+        self::getInstance()->skip = true;
+    }
+
+
     private function getPostProcessor( ) {
         if ( $this->post_processor ) return $this->post_processor;
         else return PostProcessor::getInstance();
@@ -158,7 +168,6 @@ class Route
         }
         return self::$me;
     }
-
 
     private function handleError( FrameworkException $e ) {
         if ( $this->error_response == null ) {
