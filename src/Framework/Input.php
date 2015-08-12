@@ -162,9 +162,10 @@ class Input {
         return $response;
     }
 
-    public function bind( $data ) {
+    public static function bind( $data ) {
+        $me = self::getInstance();
         if ( isset($data['parameters'] ) ) {
-            $this->parameters = $data['parameters'];
+            $me->parameters = $data['parameters'];
         }
 
         if ( isset($data['files'] ) ) {
