@@ -63,8 +63,11 @@ class Config
         if ( !isset($key_array[0]) ) return false;
 
         if ( !isset(self::$data[$key_array[0]])) {
-            self::$data[$key_array[0]] =
-                include $base_path . '/config/' . $key_array[0] . '.php';
+            $file_path = $base_path . '/config/' . $key_array[0] . '.php';
+            if ( file_exists($file_path) )
+                self::$data[$key_array[0]] = include $file_path;
+            else self::$data[$key_array[0] ] = null;
+
             if ( self::$data[$key_array[0]] == false ) {
                 self::$data[$key_array[0]] = null;
             }
