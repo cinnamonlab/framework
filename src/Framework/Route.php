@@ -24,11 +24,14 @@ class Route
     static function action($method, $path, $function) {
 
         $me = self::getInstance();
+
+        if ( Input::has('__request_method') ) $request_method = Input::get('__request_method');
+        else $request_method = $_SERVER['REQUEST_METHOD'];
         if ($me->is_called == true) return IgnoreProcessor::getInstance();
 
         if ( $method != 'otherwise' ) {
 
-            if ($method != $_SERVER['REQUEST_METHOD'])
+            if ($method != $request_method )
                 return IgnoreProcessor::getInstance();
 
 
@@ -170,6 +173,7 @@ class Route
 
             $this->path = array_values($requestUri);
             Input::set('__request_uri', $this->path);
+            Input::set('__request_method', $_SERVER['REQUEST_METHOD']);
         }
 
 

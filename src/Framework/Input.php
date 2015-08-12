@@ -140,7 +140,13 @@ class Input {
 
     public static function getAllData( ) {
         $response = array('parameters' => $_REQUEST );
+
         $me = self::getInstance();
+
+        foreach( $me->parameters as $key => $value ) {
+            $response['parameters'][$key] = $value;
+        }
+
 
         if ( $me->file_serialization ) {
             if (isset($_FILES) && count($_FILES) > 0) {
