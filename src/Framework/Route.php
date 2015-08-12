@@ -133,7 +133,14 @@ class Route
 
     private function getPostProcessor( ) {
         if ( $this->post_processor ) return $this->post_processor;
-        else return PostProcessor::getInstance();
+
+        if ( Config::has('app.post_processor') ) {
+            $this->post_processor = Config::get('app.post_processor');
+        } else {
+            $this->post_processor = new PostProcessor();
+
+        }
+        return $this->post_processor;
     }
 
 
@@ -177,7 +184,9 @@ class Route
 
     private function handleError( FrameworkException $e ) {
         if ( $this->error_response == null ) {
-            if ( Config::get('app.debug', false ) )
+            if ( Config::has('app.error_response') )
+                $this->error_response = Config::get('app.error_response');
+            else if ( Config::get('app.debug', false ) )
                 $this->error_response = new ErrorDisplayResponse();
             else $this->error_response = new ErrorResponse();
         }
