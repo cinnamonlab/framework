@@ -51,6 +51,11 @@ class Input {
         return $value;
     }
 
+     function parseInput( ) {
+        parse_str(file_get_contents('php://input'), $parameters);
+        return $parameters;
+    }
+
     static function has($key) {
         $me = self::getInstance();
         if ( isset($me->parameters[$key])) return true;
@@ -178,5 +183,16 @@ class Input {
             $_FILES = $data['files'];
         }
         return;
+    }
+
+    private function __construct( ) {
+        if ( isset($_SERVER['REQUEST_METHOD']) &&
+            $_SERVER['REQUEST_METHOD'] != 'POST' &&
+            $_SERVER['REQUEST_METHOD'] != 'GET') {
+            $parameters = $this->parseInput();
+            foreach($parameters as $key=>$v) {
+                $this->parameters[$key] = $v;
+            }
+        }
     }
 }
