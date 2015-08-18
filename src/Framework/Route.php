@@ -190,7 +190,7 @@ class Route
         if ( $this->error_response == null ) {
             if ( Config::has('app.error_response') )
                 $this->error_response = Config::get('app.error_response');
-            else if ( Config::get('app.debug', false ) )
+            else if ( Config::get('app.debug', true ) )
                 $this->error_response = new ErrorDisplayResponse();
             else $this->error_response = new ErrorResponse();
         }
