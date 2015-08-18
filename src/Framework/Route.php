@@ -86,11 +86,13 @@ class Route
             $me->is_called = true;
         } catch ( FrameworkException $e ) {
             $me->handleError( $e );
+            $me->is_called = true;
             return IgnoreProcessor::getInstance();
 
         } catch ( Exception $e ) {
             $exception = FrameworkException::internalError('Internal Error: ' . $e->getMessage( ) );
             $me->handleError($exception);
+            $me->is_called = true;
             return IgnoreProcessor::getInstance();
         }
         return $me->getPostProcessor();
