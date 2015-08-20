@@ -59,6 +59,8 @@ class Input {
     static function has($key) {
         $me = self::getInstance();
         if ( isset($me->parameters[$key])) return true;
+
+        if ( isset($_REQUEST[$key]) ) return true;
         return false;
     }
 
