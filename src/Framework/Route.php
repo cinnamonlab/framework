@@ -72,7 +72,10 @@ class Route
                 $class_name = 'App\\Controller\\' . $function_array[0];
                 $method_name = $function_array[1];
 
-                $response = $class_name::$method_name();
+                //$response = $class_name::$method_name();
+                // Initialization controller object
+                $controller = new $class_name;
+                $response = $controller->$method_name();
             }
 
             if ( $response instanceof Response ) {
