@@ -22,7 +22,7 @@ class Route
     }
 
     static function action($method, $path, $function) {
-
+        $restInput =array();
         $me = self::getInstance();
 
         if ( Input::has('__request_method') ) $request_method = Input::get('__request_method');
@@ -48,6 +48,7 @@ class Route
                     || preg_match("/^\{(.*)\}$/", $path_element, $match)
                 ) {
                     Input::set($match[1], $me->path[$key]);
+                    $restInput[]=$me->path[$key];
                 } else {
                     if (!isset($me->path[$key]) ||
                         $me->path[$key] != $path_element
@@ -75,7 +76,9 @@ class Route
                 //$response = $class_name::$method_name();
                 // Initialization controller object
                 $controller = new $class_name;
-                $response = $controller->$method_name();
+
+                call_user_func_array(array($controller,$method_name),$restInput);
+                //$response = $controller->$method_name();
             }
 
             if ( $response instanceof Response ) {
