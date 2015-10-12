@@ -43,6 +43,10 @@ class Route
             }
             $path_array = array_values($path_array);
 
+            if(count($path_array)!=count($me->path)) {
+                return $me->getPostProcessor();
+            }
+
             foreach ($path_array as $key => $path_element) {
                 if (preg_match("/^\:(.*)$/", $path_element, $match)
                     || preg_match("/^\{(.*)\}$/", $path_element, $match)
@@ -77,7 +81,7 @@ class Route
                 // Initialization controller object
                 $controller = new $class_name;
 
-                call_user_func_array(array($controller,$method_name),$restInput);
+                $response=call_user_func_array(array($controller,$method_name),$restInput);
                 //$response = $controller->$method_name();
             }
 
@@ -180,6 +184,13 @@ class Route
             }
 
             $this->path = array_values($requestUri);
+
+            foreach($this->path as $key => $path_element) {
+                if (strlen(trim($path_element)) == 0) {
+                    unset($this->path[$key]);
+                }
+            }
+
             Input::set('__request_uri', $this->path);
             Input::set('__request_method', $_SERVER['REQUEST_METHOD']);
         }
