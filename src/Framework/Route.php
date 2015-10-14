@@ -183,13 +183,13 @@ class Route
                 }
             }
 
-            $this->path = array_values($requestUri);
-
-            foreach($this->path as $key => $path_element) {
+            foreach($requestUri as $key => $path_element) {
                 if (strlen(trim($path_element)) == 0) {
-                    unset($this->path[$key]);
+                    unset($requestUri[$key]);
                 }
             }
+
+            $this->path = array_values($requestUri);
 
             Input::set('__request_uri', $this->path);
             Input::set('__request_method', $_SERVER['REQUEST_METHOD']);
