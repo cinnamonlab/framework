@@ -143,6 +143,7 @@ class Response {
         if ( $code == 403 ) return 'HTTP/1.0 403 Forbidden';
         if ( $code == 404 ) return 'HTTP/1.0 404 Not Found';
         if ( $code == 500 ) return 'HTTP/1.0 500 Internal Server Error';
+        if ( $code == 505 ) return 'HTTP/1.0 505 Version Incompatibility Error';
 
         return 'HTTP/1.0 500 Internal Server Error';
     }
