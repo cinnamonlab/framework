@@ -48,8 +48,8 @@ class Config
     
     public static function has( $key ) {
 
-        if ( defined('__APP__') ) $base_path = __APP__;
-        else {
+//        if ( defined('__APP__') ) $base_path = __APP__;
+//        else {
             $base_path_array = preg_split("/\//", __DIR__);
 //            $base_path = "";
 //            foreach($base_path_array as $b) {
@@ -57,9 +57,9 @@ class Config
 //                if ( $b == 'vendor' ) break;
 //                $base_path .= "/" . $b;
 //            }
-//            why do not write like this
-            $base_path = substr(__DIR__,0, strrpos(__DIR__, "vendor") - 1);
-        }
+//        }
+//      why do not write like this
+        $base_path = defined('__APP__') ? __APP__ : substr(__DIR__,0, strrpos(__DIR__, "vendor") - 1);
 
         $key_array = preg_split('/\./', $key );
         if ( !isset($key_array[0]) ) return false;
