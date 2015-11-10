@@ -25,8 +25,10 @@ class Route
         $restInput =array();
         $me = self::getInstance();
 
-        if ( Input::has('__request_method') ) $request_method = Input::get('__request_method');
-        else $request_method = $_SERVER['REQUEST_METHOD'];
+//        if ( Input::has('__request_method') ) $request_method = Input::get('__request_method');
+//        else $request_method = $_SERVER['REQUEST_METHOD'];
+        $request_method = Input::get('__request_method') ?: $_SERVER['REQUEST_METHOD'];
+
         if ($me->is_called == true) return IgnoreProcessor::getInstance();
 
         if ( $method != 'otherwise' ) {
@@ -79,9 +81,10 @@ class Route
 
                 //$response = $class_name::$method_name();
                 // Initialization controller object
-                $controller = new $class_name;
+//                $controller = new $class_name;
+//                $response=call_user_func_array(array($controller,$method_name),$restInput);
+                $response=call_user_func_array(array($class_name,$method_name),$restInput);
 
-                $response=call_user_func_array(array($controller,$method_name),$restInput);
                 //$response = $controller->$method_name();
             }
 
@@ -147,15 +150,18 @@ class Route
 
 
     private function getPostProcessor( ) {
-        if ( $this->post_processor ) return $this->post_processor;
-
-        if ( Config::has('app.post_processor') ) {
-            $this->post_processor = Config::get('app.post_processor');
-        } else {
-            $this->post_processor = new PostProcessor();
-
-        }
-        return $this->post_processor;
+//        if ( $this->post_processor ) return $this->post_processor;
+//
+//        if ( Config::has('app.post_processor') ) {
+//            $this->post_processor = Config::get('app.post_processor');
+//        } else {
+//            $this->post_processor = new PostProcessor();
+//
+//        }
+//        return $this->post_processor;
+        return $this->post_processor ?:
+            ($this->post_processor = Config::get('app.post_processor') ?:
+                $this->post_processor = new PostProcessor());
     }
 
 
