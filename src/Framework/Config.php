@@ -51,12 +51,14 @@ class Config
         if ( defined('__APP__') ) $base_path = __APP__;
         else {
             $base_path_array = preg_split("/\//", __DIR__);
-            $base_path = "";
-            foreach($base_path_array as $b) {
-                if ( $b == "" ) continue;
-                if ( $b == 'vendor' ) break;
-                $base_path .= "/" . $b;
-            }
+//            $base_path = "";
+//            foreach($base_path_array as $b) {
+//                if ( $b == "" ) continue;
+//                if ( $b == 'vendor' ) break;
+//                $base_path .= "/" . $b;
+//            }
+//            why do not write like this
+            $base_path = substr(__DIR__,0, strrpos(__DIR__, "vendor") - 1);
         }
 
         $key_array = preg_split('/\./', $key );
@@ -66,10 +68,12 @@ class Config
             $file_path = $base_path . '/config/' . $key_array[0] . '.php';
             if ( file_exists($file_path) )
                 self::$data[$key_array[0]] = include $file_path;
-            else self::$data[$key_array[0] ] = null;
-
+//            else self::$data[$key_array[0] ] = null;
+//          why should not do like this:
+            else return false;
             if ( self::$data[$key_array[0]] == false ) {
-                self::$data[$key_array[0]] = null;
+//                self::$data[$key_array[0]] = null;
+                return false;
             }
         }
 
