@@ -199,10 +199,12 @@ class Route
     }
 
     private static function getInstance( ) {
-        if ( self::$me == null ) {
-            self::$me = new Route();
-        }
-        return self::$me;
+//        if ( self::$me == null ) {
+//            self::$me = new Route();
+//        }
+//        return self::$me;
+//        is this acceptable?
+        return self::$me?: self::$me = new Route();
     }
 
     private function handleError( FrameworkException $e ) {
