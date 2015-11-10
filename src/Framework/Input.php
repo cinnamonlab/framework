@@ -22,33 +22,36 @@ class Input {
     {
         $me = self::getInstance();
 
-        if (isset($me->parameters[$key]) ) {
-            $value = $me->parameters[$key];
-        } else if ( isset($_REQUEST[$key]) ) {
-            $value = $_REQUEST[$key];
-        } else {
-            $value = $me->processDefaultValue($default);
-        }
+//        if (isset($me->parameters[$key]) ) {
+//            $value = $me->parameters[$key];
+//        } else if ( isset($_REQUEST[$key]) ) {
+//            $value = $_REQUEST[$key];
+//        } else {
+//            $value = $me->processDefaultValue($default);
+//        }
+        // can be write like this
+        $value = $me->parameters[$key] ?: ($_REQUEST[$key] ?: $me->processDefaultValue($default));
 
-        if ($validator instanceof Validator) {
-            if ( $validator->execute($value) ) {
-                return $value;
-            } else {
-                return $me->processDefaultValue($default);
-            }
-
-        } else if (is_callable($validator)) {
-            try {
-                if ($validator($value) ) {
-                    return $value;
-                } else {
-                    return $me->processDefaultValue($default);
-                }
-            } catch (Exception $e) {
-                throw FrameworkException::internalError("Validator error");
-            }
-        }
-        return $value;
+//        refactor code
+//        if ($validator instanceof Validator) {
+//            if ( $validator->execute($value) ) {
+//                return $value;
+//            } else {
+//                return $me->processDefaultValue($default);
+//            }
+//        } else if (is_callable($validator)) {
+//            try {
+//                if ($validator($value) ) {
+//                    return $value;
+//                } else {
+//                    return $me->processDefaultValue($default);
+//                }
+//            } catch (Exception $e) {
+//                throw FrameworkException::internalError("Validator error");
+//            }
+//        }
+//        return $value;
+        return self::validate($value, $validator, $default);
     }
 
      function parseInput( ) {
@@ -81,27 +84,27 @@ class Input {
         $file = new InputFile($_FILES[$key]['tmp_name']);
         $file->setContentType($_FILES[$key]['type']);
         $file->setOriginalName($_FILES[$key]['name']);
-
-        if ($validator instanceof Validator) {
-            if ( $validator->execute( $file ) ) {
-                return $file;
-            } else {
-                return self::processError($default);
-            }
-
-        } else if (is_callable($validator)) {
-            try {
-                if ($validator($file) ) {
-                    return $file;
-                } else {
-                    return self::processError($default);
-                }
-            } catch (Exception $e) {
-                throw FrameworkException::internalError("Validator error");
-            }
-        }
-
-        return $file;
+//      could decompose to one function
+//        if ($validator instanceof Validator) {
+//            if ( $validator->execute( $file ) ) {
+//                return $file;
+//            } else {
+//                return self::processError($default);
+//            }
+//
+//        } else if (is_callable($validator)) {
+//            try {
+//                if ($validator($file) ) {
+//                    return $file;
+//                } else {
+//                    return self::processError($default);
+//                }
+//            } catch (Exception $e) {
+//                throw FrameworkException::internalError("Validator error");
+//            }
+//        }
+//        return $file;
+        return self::validate($file, $validator, $default);
     }
     /**
      * Set Value Manually
@@ -196,5 +199,28 @@ class Input {
                 $this->parameters[$key] = $v;
             }
         }
+    }
+
+    private static function validate($data, $validator, $default)
+    {
+        if ($validator instanceof Validator) {
+            if ( $validator->execute( $data ) ) {
+                return $data;
+            } else {
+                return self::processError($default);
+            }
+
+        } else if (is_callable($validator)) {
+            try {
+                if ($validator($data) ) {
+                    return $data;
+                } else {
+                    return self::processError($default);
+                }
+            } catch (Exception $e) {
+                throw FrameworkException::internalError("Validator error");
+            }
+        }
+        return $data;
     }
 }
