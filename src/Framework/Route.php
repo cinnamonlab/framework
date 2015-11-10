@@ -209,11 +209,13 @@ class Route
 
     private function handleError( FrameworkException $e ) {
         if ( $this->error_response == null ) {
-            if ( Config::has('app.error_response') )
-                $this->error_response = Config::get('app.error_response');
-            else if ( Config::get('app.debug', true ) )
-                $this->error_response = new ErrorDisplayResponse();
-            else $this->error_response = new ErrorResponse();
+//            if ( Config::has('app.error_response') )
+//                $this->error_response = Config::get('app.error_response');
+//            else if ( Config::get('app.debug', true ) )
+//                $this->error_response = new ErrorDisplayResponse();
+//            else $this->error_response = new ErrorResponse();
+            $this->error_response = Config::get('app.error_response') ?:
+                (Config::get('app.debug', true ) ? new ErrorDisplayResponse() : new ErrorResponse());
         }
         $this->error_response->set( $e )->display();
         return true;
