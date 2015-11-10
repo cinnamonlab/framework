@@ -149,14 +149,16 @@ class Input {
     }
 
     public static function getAllData( ) {
-        $response = array('parameters' => $_REQUEST );
-
+//        $response = array('parameters' => $_REQUEST );
+//
+//        $me = self::getInstance();
+//
+//        foreach( $me->parameters as $key => $value ) {
+//            $response['parameters'][$key] = $value;
+//        }
         $me = self::getInstance();
-
-        foreach( $me->parameters as $key => $value ) {
-            $response['parameters'][$key] = $value;
-        }
-
+        $response = array();
+        $response["parameters"] = $me->parameters + $_REQUEST;
 
         if ( $me->file_serialization ) {
             if (isset($_FILES) && count($_FILES) > 0) {
@@ -165,12 +167,12 @@ class Input {
                         do {
                             $to_file = __APP__ . "/storage/files/" . md5($file['tmp_name'] . rand(0, 100000));
                         } while (file_exists($to_file));
-
+                        // TODO: each time call this method, files are copy?
                         if (copy($file['tmp_name'], $to_file)) {
                             $response['files'][$key] = $file;
+                            // TODO: I think it should be: $response['files'][$key]['tmp_name'] = $to_file;
                             $response['files']['tmp_name'] = $to_file;
                         }
-
                     }
                 }
             }
@@ -194,10 +196,12 @@ class Input {
         if ( isset($_SERVER['REQUEST_METHOD']) &&
             $_SERVER['REQUEST_METHOD'] != 'POST' &&
             $_SERVER['REQUEST_METHOD'] != 'GET') {
-            $parameters = $this->parseInput();
-            foreach($parameters as $key=>$v) {
-                $this->parameters[$key] = $v;
-            }
+//            $parameters = $this->parseInput();
+//            foreach($parameters as $key=>$v) {
+//                $this->parameters[$key] = $v;
+//            }
+//            why not write like this?
+            $this->parameters = $this->parseInput();
         }
     }
 
