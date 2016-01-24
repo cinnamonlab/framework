@@ -74,7 +74,9 @@ class Route
                 if ( !isset($function_array[1]))
                     throw FrameworkException::internalError('Routing Error');
 
-                $class_name = 'App\\Controller\\' . $function_array[0];
+                $controller_namespace = Config::get("app.controller_namespace","App\\Controller\\");
+
+                $class_name = $controller_namespace . $function_array[0];
                 $method_name = $function_array[1];
 
                 //$response = $class_name::$method_name();
